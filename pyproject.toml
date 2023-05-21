@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "fuzzy-logic-implementation"
+version = "0.1.0"
+description = ""
+authors = ["Nathan Angelo B. Cruz <jonathan.a.b.cross@gmail.com>"]
+readme = "README.md"
+packages = [{include = "fuzzy_logic_implementation"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fuzzylogic = "^1.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
