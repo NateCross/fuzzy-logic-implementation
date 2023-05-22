@@ -1,4 +1,4 @@
-# Setuo
+# Setup
 
 This project is managed by [Poetry](https://python-poetry.org/). Download it first.
 
