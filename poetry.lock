@@ -439,14 +439,20 @@ description = "Fuzzy logic toolkit for SciPy"
 category = "main"
 optional = false
 python-versions = "*"
-files = [
-    {file = "scikit-fuzzy-0.4.2.tar.gz", hash = "sha256:1ab12424d847ede1bc79670d8058167be7c8dd660b00756e9b844817ceb1e12e"},
-]
+files = []
+develop = false
 
 [package.dependencies]
+matplotlib = ">=3.1.0"
 networkx = ">=1.9.0"
 numpy = ">=1.6.0"
 scipy = ">=0.9.0"
+
+[package.source]
+type = "git"
+url = "https://github.com/NateCross/scikit-fuzzy.git"
+reference = "HEAD"
+resolved_reference = "a56929432888bff76ee6e0ea287328e8b88936a9"
 
 [[package]]
 name = "scipy"
@@ -502,4 +508,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "b0a0b538b4478f10b6dd7a14adca0759c14b06b19ba36096a82434e906ec6070"
+content-hash = "01d1c23b715cee2f64bb805fff29eba20a9ddac868eddb7e8aff48922ecffc11"
