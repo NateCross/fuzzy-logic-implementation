@@ -452,7 +452,7 @@ scipy = ">=0.9.0"
 type = "git"
 url = "https://github.com/NateCross/scikit-fuzzy.git"
 reference = "HEAD"
-resolved_reference = "a56929432888bff76ee6e0ea287328e8b88936a9"
+resolved_reference = "d834b9a178d0f3f9e621a673aba472c0713f5d0c"
 
 [[package]]
 name = "scipy"
