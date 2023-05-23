@@ -7,24 +7,68 @@ from matplotlib.backends.backend_tkagg import (
 import skfuzzy as fuzz
 from skfuzzy import control as ctrl
 
+
 if __name__ == "__main__":
     root = tkinter.Tk()
     root.wm_title("Fuzzy Logic")
 
-    level = ctrl.Antecedent(np.arange(-50, 50, 1), 'Level')
-    temp = ctrl.Antecedent(np.arange(-50, 50, 1), 'Temperature')
-    heat = ctrl.Consequent(np.arange(-50, 50, 1), 'Heat')
+    level = ctrl.Antecedent(np.arange(0, 100, 1), 'Level')
+    rate_of_change = ctrl.Antecedent(
+        np.arange(-100, 100, 1), 
+        'Rate of Change',
+    )
+    valve = ctrl.Consequent(np.arange(0, 100, 1), 'State of Valve')
 
-    level.automf(names=["Low", "Medium", "High"])
-    temp.automf(names=["Low", "Medium", "High"])
-    heat.automf(names=["Low", "Medium", "High"])
+    level.automf(names=[
+        "Very Low", 
+        "Low", 
+        "Medium", 
+        "High", 
+        "Very High",
+    ])
+    rate_of_change.automf(names=[
+        "Negative", 
+        "Neutral", 
+        "Positive",
+    ])
+    valve.automf(names=[
+        "Sudden Close",
+        "Open Slow",
+        "Open Medium",
+        "Open Fast",
+        "Sudden Open",
+    ])
 
 # Fuzzy rules
-
     water_control_system = ctrl.ControlSystem([
-    ctrl.Rule(level['Low'] | temp['High'], heat['High']),
-    ctrl.Rule(level['Medium'] | temp['Medium'], heat['Medium']),
-    ctrl.Rule(level['High'] | temp['Low'], heat['Low']),
+        ctrl.Rule(
+            level['Very High'], 
+            valve['Sudden Close'],
+        ),
+        ctrl.Rule(
+            level['High'] & rate_of_change['Positive'],
+            valve['Open Medium'],
+        ),
+        ctrl.Rule(
+            level['High'] & rate_of_change['Neutral'],
+            valve['Sudden Close'],
+        ),
+        ctrl.Rule(
+            level['High'] & rate_of_change['Negative'],
+            valve['Sudden Close'],
+        ),
+        ctrl.Rule(
+            level['Medium'],
+            valve['Open Medium'],
+        ),
+        ctrl.Rule(
+            level['Low'],
+            valve['Open Fast'],
+        ),
+        ctrl.Rule(
+            level['Very Low'],
+            valve['Sudden Open'],
+        ),
     ])
 
 # Compute first so that when the frame is initialized,
@@ -32,16 +76,16 @@ if __name__ == "__main__":
     water_control = ctrl.ControlSystemSimulation(water_control_system)
     water_control.inputs({
         'Level': 0,
-        'Temperature': 0,
+        'Rate of Change': 0,
     })
     water_control.compute()
 
     level_var = tkinter.DoubleVar()
-    temp_var = tkinter.DoubleVar()
+    rate_var = tkinter.DoubleVar()
     output_var = tkinter.DoubleVar()
     output_formatted = tkinter.StringVar()
 
-    fig, _ = heat.get_view(sim=water_control)
+    fig, _ = valve.get_view(sim=water_control)
 
 # Define tkinter widgets
 
@@ -56,29 +100,46 @@ if __name__ == "__main__":
     canvas = FigureCanvasTkAgg(fig, master=canvas_frame)
     canvas.draw()
 
+    toolbar = NavigationToolbar2Tk(canvas, canvas_frame, pack_toolbar=False)
+    toolbar.update()
+
     def update_system():
         global canvas
+        global toolbar
 
         water_control.inputs({
             'Level': level_var.get(),
-            'Temperature': temp_var.get(),
+            'Rate of Change': rate_var.get(),
         })
         water_control.compute()
-        output_var.set(water_control.output['Heat'])
+        output_var.set(water_control.output['State of Valve'])
         output_formatted.set(f"{output_var.get():9.2f}")
 
         # So far, only way to make it refresh
         # due to the unique construction of this widget
-        # Improvements welcome
         canvas.get_tk_widget().destroy()
-        fig, _ = heat.get_view(sim=water_control)
+        fig, _ = valve.get_view(sim=water_control)
         canvas = FigureCanvasTkAgg(fig, master=canvas_frame)
         canvas.draw()
+
+        # toolbar.update()
+        toolbar.destroy()
+        toolbar = NavigationToolbar2Tk(canvas, canvas_frame, pack_toolbar=False)
+        toolbar.update()
+        toolbar.pack(
+            side=tkinter.BOTTOM,
+            fill=tkinter.X,
+        )
         canvas.get_tk_widget().pack(
             side=tkinter.RIGHT,
             fill=tkinter.BOTH,
             expand=True,
         )
+
+    toolbar.pack(
+        side=tkinter.BOTTOM,
+        fill=tkinter.X,
+    )
 
     canvas.get_tk_widget().pack(
         side=tkinter.LEFT,
@@ -105,7 +166,6 @@ if __name__ == "__main__":
         sticky="",
     )
 
-
     level_frame = tkinter.Frame(
         control_frame_buttons,
         relief=tkinter.GROOVE,
@@ -127,40 +187,40 @@ if __name__ == "__main__":
     level_slider = tkinter.Scale(
         level_frame,
         variable=level_var,
-        from_=-50,
-        to=50,
+        from_=0,
+        to=100,
         orient=tkinter.HORIZONTAL,
         showvalue=False,
     ).pack()
     for child in level_frame.winfo_children():
         child.pack_configure(padx=5, pady=5)
 
-    temp_frame = tkinter.Frame(
+    rate_frame = tkinter.Frame(
         control_frame_buttons,
         relief=tkinter.GROOVE,
         pady=20,
         borderwidth=2,
     )
-    temp_frame.pack(pady=20)
-    temp_label = tkinter.Label(
-        temp_frame,
-        text="Temperature",
+    rate_frame.pack(pady=20)
+    rate_label = tkinter.Label(
+        rate_frame,
+        text="Rate of Change",
     ).pack()
-    temp_entry = tkinter.Entry(
-        temp_frame,
-        textvariable=temp_var,
+    rate_entry = tkinter.Entry(
+        rate_frame,
+        textvariable=rate_var,
         width=4,
         justify=tkinter.CENTER,
     ).pack()
-    temp_slider = tkinter.Scale(
-        temp_frame,
-        variable=temp_var,
-        from_=-50,
-        to=50,
+    rate_slider = tkinter.Scale(
+        rate_frame,
+        variable=rate_var,
+        from_=-100,
+        to=100,
         orient=tkinter.HORIZONTAL,
         showvalue=False,
     ).pack()
-    for child in temp_frame.winfo_children():
+    for child in rate_frame.winfo_children():
         child.pack_configure(padx=5, pady=5)
 
     output_frame = tkinter.Frame(
@@ -172,7 +232,7 @@ if __name__ == "__main__":
     output_frame.pack(pady=20)
     output_label = tkinter.Label(
         output_frame,
-        text="Output",
+        text="Output: State of Valve",
     ).pack()
     output_text = tkinter.Label(
         output_frame,
