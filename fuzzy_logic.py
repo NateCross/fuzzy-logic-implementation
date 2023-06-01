@@ -12,16 +12,19 @@ if __name__ == "__main__":
     root = tkinter.Tk()
     root.wm_title("Fuzzy Logic")
 
-    level = ctrl.Antecedent(np.arange(0, 11, 1), 'Water Level')
+    level = ctrl.Antecedent(np.arange(0, 11, 0.1), 'Water Level')
     water_temperature = ctrl.Antecedent(
-        np.arange(0, 136, 1), 
+        np.arange(0, 121, 0.1), 
         'Water Temperature',
     )
-    heater_value = ctrl.Consequent(np.arange(0, 11, 1), 'Heater Value')
+    heater_value = ctrl.Consequent(
+        np.arange(0, 11, 0.1), 
+        'Heater Value',
+    )
 
     level['Very Low'] = fuzz.trimf(
         level.universe,
-        [0, 1, 2]
+        [0, 0, 2]
     )
     level['Low'] = fuzz.trimf(
         level.universe,
@@ -37,11 +40,11 @@ if __name__ == "__main__":
     )
     level['Very High'] = fuzz.trimf(
         level.universe,
-        [8, 9, 10],
+        [8, 10, 10],
     )
     water_temperature['Very Cool'] = fuzz.trimf(
         water_temperature.universe,
-        [0, 15, 30]
+        [0, 0, 30]
     )
     water_temperature['Cool'] = fuzz.trimf(
         water_temperature.universe,
@@ -61,7 +64,7 @@ if __name__ == "__main__":
     )
     heater_value['Very Little'] = fuzz.trimf(
         heater_value.universe,
-        [0, 1, 2],
+        [0, 0, 2],
     )
     heater_value['Little'] = fuzz.trimf(
         heater_value.universe,
@@ -77,7 +80,7 @@ if __name__ == "__main__":
     )
     heater_value['A Lot'] = fuzz.trimf(
         heater_value.universe,
-        [8, 9, 10],
+        [8, 10, 10],
     )
 
 # Fuzzy rules
@@ -307,7 +310,7 @@ if __name__ == "__main__":
     water_temperature_frame.pack(pady=20)
     water_temperature_label = tkinter.Label(
         water_temperature_frame,
-        text="Water Temperature",
+        text="Water Temperature (°C)",
     ).pack()
     water_temperature_entry = tkinter.Entry(
         water_temperature_frame,
@@ -319,7 +322,7 @@ if __name__ == "__main__":
         water_temperature_frame,
         variable=rate_var,
         from_=0,
-        to=135,
+        to=121,
         tickinterval=0.1,
         orient=tkinter.HORIZONTAL,
         showvalue=False,
